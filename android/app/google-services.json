@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "37056211271",
+    "project_id": "chatapp-13f86",
+    "storage_bucket": "chatapp-13f86.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:37056211271:android:939edb995fe5ff11554462",
+        "android_client_info": {
+          "package_name": "com.whattsappnewclone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPM03F8cbUDYWYFfQ445vJFyX4Idp3reI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

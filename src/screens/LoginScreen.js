@@ -48,13 +48,13 @@ const LoginScreen = () => {
     dispatch(setPersonalDetails({age: 23}));
   }, []);
 
-  // useEffect(() => {
-  //   const referance = database()
-  //     .ref('/users/AJ')
-  //     .on('value', snapshot => {
-  //       console.log('User data: ', snapshot.val());
-  //     });
-  // });
+  useEffect(() => {
+    const referance = database()
+      .ref('/users/AJ')
+      .on('value', snapshot => {
+        console.log('User data: ', snapshot.val());
+      });
+  });
 
   const navigation = useNavigation();
   const handlebutton = () => {

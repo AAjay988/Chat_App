@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Avatar, IconButton} from 'react-native-paper';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
+
 
 const ChatsScreen = () => {
   const navigation = useNavigation();
@@ -13,31 +14,59 @@ const ChatsScreen = () => {
   useEffect(() => {
     getUsers();
   }, []);
-
   const getUsers = async () => {
-    const userUid = await AsyncStorage.getItem('userId');
+    try {
+      const userUid = await AsyncStorage.getItem('userId');
+      database()
+        .ref('/users/')
+        .on('value', snapshot => {
+          const userData = snapshot.val();
+          if (userData) {
+            const tempUsers = Object.keys(userData).map(userId => ({
+              ...userData[userId],
+              uid: userId,
+            })).filter(user => user.uid !== userUid)
+            setUser(tempUsers);
+            //console.log('tempusers:',tempUsers[0].uid);
+          }
+        });
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+  /*const getUsers = async () => {
+    // const userUid = await AsyncStorage.getItem('userId');
     database()
       .ref('/users/')
       .on('value', snapshot => {
         const userData = snapshot.val();
-        {
-      //     console.log(userData);
-      // setUsers(Object.values(userData))
-        }
-        const tempUsers = [];
-        Object.keys(userData).map(userId => {
-          //console.log(userId,userUid);
-          if (userId !== userUid) {
-            tempUsers.push({
-              ...userData[userId],
-              uid: userId,
-            });
-          }
-        });
-        setUser(tempUsers);
-      });
-  };
 
+           console.log('userData:',userData);
+      // setUsers(Object.values(userData))
+        
+        if (userData) {
+          const tempUsers = Object.keys(userData).map(userId => ({
+            ...userData[userId],
+            uid: userId,
+          })) 
+          setUser(tempUsers)
+          console.log('tempUsers:',tempUsers);
+
+        }
+        // Object.keys(userData).map(userId => {
+        //   //console.log(userId,userUid);
+        //   if (userId !== userUid) {
+        //     tempUsers.push({
+        //       ...userData[userId],
+        //       uid: userId,
+        //       pic: userPic
+              
+        //     });
+        //   }
+        // });
+        //setUser(tempUsers);
+      });
+  };*/
   const renderAvatarColor = index => {
     const colors = [
       '#FF5733',
@@ -52,7 +81,7 @@ const ChatsScreen = () => {
   };
 
   const RenderCard = ({item, index}) => {
-    //console.log(item);
+    console.log(item);
     const handleButton = () => {
       navigation.navigate('Chatting', {name: item.lastName,uid:item.uid});
     };
@@ -60,12 +89,7 @@ const ChatsScreen = () => {
     return (
       <TouchableOpacity onPress={handleButton}>
         <View style={styles.myCard}>
-          <Avatar.Text
-            size={50}
-            label={`${item.firstName.charAt(0)}${item.lastName.charAt(0)}`}
-            color="white"
-            style={{backgroundColor: renderAvatarColor(index)}}
-          />
+        <Image source={{ uri: item.pic }} style={styles.imgStyle} />
           <View>
             <Text
               style={

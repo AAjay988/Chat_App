@@ -15,8 +15,8 @@ import {IconButton, TextInput} from 'react-native-paper';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {ProfileImage, WhatsappLogoo} from '../components/ImageLinks';
 import auth from '@react-native-firebase/auth';
-import database, {firebase} from '@react-native-firebase/database';
-import firestore from '@react-native-firebase/firestore';
+import database from '@react-native-firebase/database';
+import storage from '@react-native-firebase/storage';
 
 const SignupScreen = () => {
   const navigation = useNavigation();
@@ -33,7 +33,8 @@ const SignupScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(ProfileImage);
+  const [selectedImage, setSelectedImage] = useState('');
+  const [downloadURL, setDownloadURL] = useState('');
 
   const userSignup = async () => {
     try {
@@ -46,86 +47,69 @@ const SignupScreen = () => {
             lastName: lastName,
             email: email,
             phoneNumber: phoneNumber,
+            pic: downloadURL,
           });
           console.log(responce);
         });
     } catch (error) {
       console.error('Error', error.message);
+      alert('Somethimg wrong');
     }
   };
-  const OpenCamera = async () => {
-    const options = {
-      mediaType: 'photo',
-      quality: 0.8,
-      cameraType: 'back',
-      saveToPhotos: true,
-    };
-    const cameraPermission = await PermissionsAndroid.request(
-      'android.permission.CAMERA',
-      {
-        title: 'App Permission',
-        message: 'App needs Acess to your Camera',
-        buttonPositive: 'Allow',
-        buttonNegative: 'Deny',
-        buttonNeutral: 'Cancel',
-      },
-    );
-    if (cameraPermission === 'granted') {
-      launchCamera(options, image => {
-        if (
-          image &&
-          image.assets &&
-          image.assets.length > 0 &&
-          image.assets[0].uri
-        ) {
-          setSelectedImage(image.assets[0].uri);
-        }
-        //console.log(image.assets[0].uri);
-      });
-    } else {
-      console.log('Camera permission Denied');
-    }
+  
+  const OpenCamera = () => {
+    launchCamera({quality: 0.9, mediaType: 'photo'}, image => {
+      console.log(image);
+      setSelectedImage(image.assets[0].uri);
+    });
     setModalVisible(false);
   };
-  const OpenGallery = async () => {
-    const options = {
-      mediaType: 'photo',
-      quality: 0.9,
-      cameraType: 'back',
-      saveToPhotos: true,
-    };
-    const galleryPermission = await PermissionsAndroid.request(
-      'android.permission.READ_EXTERNAL_STORAGE',
-      {
-        title: 'App Permission',
-        message: 'App needs Acess to your Galley',
-        buttonPositive: 'Allow',
-        buttonNegative: 'Deny',
-        buttonNeutral: 'Cancel',
-      },
-    );
-    if (galleryPermission === 'granted') {
-      launchImageLibrary(options, image => {
-        if (
-          image &&
-          image.assets &&
-          image.assets.length > 0 &&
-          image.assets[0].uri
-        ) {
-          setSelectedImage(image.assets[0].uri);
-        }
-        //console.log(image.assets[0].uri);
-      });
-    } else {
-      console.log('Gallery permission Denied');
-    }
+
+  const OpenGallery = () => {
+    launchImageLibrary({quality: 0.9, mediaType: 'photo'}, image => {
+      const filePath = image.assets[0].uri;
+      const fileName = `userProfile/${Date.now()}`;
+      const uploadTask = storage().ref().child(fileName).putFile(filePath);
+      console.log(filePath);
+      uploadTask.on(
+        'state_changed',
+        snapshot => {
+          // Observe state change events such as progress, pause, and resume
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          if (progress === 100) {
+            alert('image uploaded');
+          }
+        },
+        error => {
+          alert('error uploading image');
+        },
+        () => {
+          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+            console.log('File available at', downloadURL);
+            setSelectedImage(downloadURL);
+            setDownloadURL(downloadURL)
+          }).catch(error =>{
+            console.error('Error getting download URL:', error);
+            alert('Error getting download URL');
+          })
+        },
+      );
+    });
     setModalVisible(false);
   };
+
+  useEffect(()=>{
+    console.log('downloadURL:',downloadURL);
+  },[downloadURL])
   return (
     <KeyboardAvoidingView behavior="position">
       <View style={styles.container}>
-        <Text style={styles.textStyle}>Signup</Text>
-        <Image source={{uri: selectedImage}} style={styles.imgStyle} />
+        {/* <Image source={{uri:WhatsappLogoo}} style={styles.imgStyle}/> */}
+        {selectedImage && (
+          <Image source={{uri: selectedImage}} style={styles.imgStyle} />
+        )}
         <AppButton
           title={'Select Photo'}
           buttonPress={() => setModalVisible(true)}
@@ -263,6 +247,7 @@ const styles = StyleSheet.create({
     width: 150,
     alignItems: 'center',
     borderRadius: 75,
+    margin:25
   },
   box2: {
     paddingHorizontal: 40,

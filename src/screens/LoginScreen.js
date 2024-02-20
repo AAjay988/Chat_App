@@ -15,17 +15,19 @@ import { WhatsappLogoo } from '../components/ImageLinks';
 const LoginScreen = () => {
   const userLogin = async () => {
     const result = await auth().signInWithEmailAndPassword(email, password);
+    console.log('result:',result);
     if (result) {
       database()
       .ref(`/users/${result.user.uid}`)
       .on('value', snapshot => {
         const userData = snapshot.val()
-        //console.log(userData);
+        console.log("userrDataa::",userData);
         try {
           const jsonValue = JSON.stringify(userData)
-        /*await*/ AsyncStorage.setItem("userData",jsonValue)
-        AsyncStorage.setItem('userId',result.user.uid)
-        console.log("user Data",jsonValue);
+        AsyncStorage.setItem("userData",jsonValue)
+        AsyncStorage.setItem('userId',result.user.uid,)
+         AsyncStorage.setItem('userPic',userData.pic)
+        console.log("usar Data",jsonValue);
         } catch (e) {
           console.log(e);
         }
@@ -38,23 +40,23 @@ const LoginScreen = () => {
       return () => referance()
   };
   
-  const dispatch = useDispatch();
-  const userDetails = useSelector(state => state.user.userData);
-  const personalDetails = useSelector(state => state.user.personalData);
-  const updateUserDetails = () => {
-    dispatch(setuserDetails({userName: 'Ajay'}));
-  };
-  useEffect(() => {
-    dispatch(setPersonalDetails({age: 23}));
-  }, []);
+  // const dispatch = useDispatch();
+  // const userDetails = useSelector(state => state.user.userData);
+  // const personalDetails = useSelector(state => state.user.personalData);
+  // const updateUserDetails = () => {
+  //   dispatch(setuserDetails({userName: 'Ajay'}));
+  // };
+  // useEffect(() => {
+  //   dispatch(setPersonalDetails({age: 23}));
+  // }, []);
 
-  useEffect(() => {
-    const referance = database()
-      .ref('/users/AJ')
-      .on('value', snapshot => {
-        console.log('User data: ', snapshot.val());
-      });
-  });
+  // useEffect(() => {
+  //   const referance = database()
+  //     .ref('/users/AJ')
+  //     .on('value', snapshot => {
+  //       console.log('User data: ', snapshot.val());
+  //     });
+  // });
 
   const navigation = useNavigation();
   const handlebutton = () => {

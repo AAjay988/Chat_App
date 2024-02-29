@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {IconButton} from 'react-native-paper';
 import Fontisto from "react-native-vector-icons/Fontisto";
-
+import storage from "@react-native-firebase/storage";
+import database from "@react-native-firebase/database";
 
 const StatusScreen = () => {
+  const [statusVideo, setStatusVideo] = useState([])
+  
   return (
     <View style={styles.container}>
       <View

@@ -1,11 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {Avatar, IconButton} from 'react-native-paper';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
-
 
 const ChatsScreen = () => {
   const navigation = useNavigation();
@@ -22,10 +28,12 @@ const ChatsScreen = () => {
         .on('value', snapshot => {
           const userData = snapshot.val();
           if (userData) {
-            const tempUsers = Object.keys(userData).map(userId => ({
-              ...userData[userId],
-              uid: userId,
-            })).filter(user => user.uid !== userUid)
+            const tempUsers = Object.keys(userData)
+              .map(userId => ({
+                ...userData[userId],
+                uid: userId,
+              }))
+              .filter(user => user.uid !== userUid);
             setUser(tempUsers);
             //console.log('tempusers:',tempUsers[0].uid);
           }
@@ -34,62 +42,17 @@ const ChatsScreen = () => {
       console.error('Error fetching users:', error);
     }
   };
-  /*const getUsers = async () => {
-    // const userUid = await AsyncStorage.getItem('userId');
-    database()
-      .ref('/users/')
-      .on('value', snapshot => {
-        const userData = snapshot.val();
 
-           console.log('userData:',userData);
-      // setUsers(Object.values(userData))
-        
-        if (userData) {
-          const tempUsers = Object.keys(userData).map(userId => ({
-            ...userData[userId],
-            uid: userId,
-          })) 
-          setUser(tempUsers)
-          console.log('tempUsers:',tempUsers);
-
-        }
-        // Object.keys(userData).map(userId => {
-        //   //console.log(userId,userUid);
-        //   if (userId !== userUid) {
-        //     tempUsers.push({
-        //       ...userData[userId],
-        //       uid: userId,
-        //       pic: userPic
-              
-        //     });
-        //   }
-        // });
-        //setUser(tempUsers);
-      });
-  };*/
-  const renderAvatarColor = index => {
-    const colors = [
-      '#FF5733',
-      '#33FF57',
-      '#5733FF',
-      'orange',
-      'yellow',
-      'indigo',
-      'red',
-    ];
-    return colors[index % colors.length];
-  };
-
-  const RenderCard = ({item, index}) => {
+  const RenderCard = ({item}) => {
     console.log(item);
     const handleButton = () => {
-      navigation.navigate('Chatting', {name: item.lastName,uid:item.uid});
+      navigation.navigate('Chatting', {name: item.lastName, uid: item.uid});
     };
 
     return (
       <TouchableOpacity onPress={handleButton}>
         <View style={styles.myCard}>
-        <Image source={{ uri: item.pic }} style={styles.imgStyle} />
+          <Image source={{uri: item.pic}} style={styles.imgStyle} />
           <View>
             <Text
               style={

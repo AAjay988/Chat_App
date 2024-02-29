@@ -56,11 +56,37 @@ const SignupScreen = () => {
       alert('Somethimg wrong');
     }
   };
-  
+
   const OpenCamera = () => {
     launchCamera({quality: 0.9, mediaType: 'photo'}, image => {
-      console.log(image);
-      setSelectedImage(image.assets[0].uri);
+      const filePath = image.assets[0].uri;
+      const fileName = `userProfile/${Date.now()}`;
+      const uploadTask = storage().ref().child(fileName).putFile(filePath);
+      uploadTask.on(
+        'state_changed',
+        snapshot => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          if (progress === 100) {
+            alert('image uploaded');
+          } else {
+            alert('error in uploading image');
+          }
+        },
+        () => {
+          uploadTask.snapshot.ref
+            .getDownloadURL()
+            .then(downloadURL => {
+              console.log('File available at', downloadURL);
+              setSelectedImage(downloadURL);
+              setDownloadURL(downloadURL);
+            })
+            .catch(error => {
+              console.error('Error getting download URL:', error);
+              alert('Error getting download URL');
+            });
+        },
+      );
     });
     setModalVisible(false);
   };
@@ -86,23 +112,26 @@ const SignupScreen = () => {
           alert('error uploading image');
         },
         () => {
-          uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-            console.log('File available at', downloadURL);
-            setSelectedImage(downloadURL);
-            setDownloadURL(downloadURL)
-          }).catch(error =>{
-            console.error('Error getting download URL:', error);
-            alert('Error getting download URL');
-          })
+          uploadTask.snapshot.ref
+            .getDownloadURL()
+            .then(downloadURL => {
+              console.log('File available at', downloadURL);
+              setSelectedImage(downloadURL);
+              setDownloadURL(downloadURL);
+            })
+            .catch(error => {
+              console.error('Error getting download URL:', error);
+              alert('Error getting download URL');
+            });
         },
       );
     });
     setModalVisible(false);
   };
 
-  useEffect(()=>{
-    console.log('downloadURL:',downloadURL);
-  },[downloadURL])
+  useEffect(() => {
+    console.log('downloadURL:', downloadURL);
+  }, [downloadURL]);
   return (
     <KeyboardAvoidingView behavior="position">
       <View style={styles.container}>
@@ -247,7 +276,7 @@ const styles = StyleSheet.create({
     width: 150,
     alignItems: 'center',
     borderRadius: 75,
-    margin:25
+    margin: 25,
   },
   box2: {
     paddingHorizontal: 40,

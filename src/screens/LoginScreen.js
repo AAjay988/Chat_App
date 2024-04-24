@@ -10,36 +10,36 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setPersonalDetails, setuserDetails} from '../redux/slices/userSlice';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { WhatsappLogoo } from '../components/ImageLinks';
+import {ProfileImage, WhatsappLogo, WhatsappLogoo} from '../components/ImageLinks';
 
 const LoginScreen = () => {
   const userLogin = async () => {
     const result = await auth().signInWithEmailAndPassword(email, password);
-    console.log('result:',result);
+    console.log('result:', result);
     if (result) {
       database()
-      .ref(`/users/${result.user.uid}`)
-      .on('value', snapshot => {
-        const userData = snapshot.val()
-        console.log("userrDataa::",userData);
-        try {
-          const jsonValue = JSON.stringify(userData)
-        AsyncStorage.setItem("userData",jsonValue)
-        AsyncStorage.setItem('userId',result.user.uid,)
-         AsyncStorage.setItem('userPic',userData.pic)
-        console.log("usar Data",jsonValue);
-        } catch (e) {
-          console.log(e);
-        }
-      })
+        .ref(`/users/${result.user.uid}`)
+        .on('value', snapshot => {
+          const userData = snapshot.val();
+          console.log('userrDataa::', userData);
+          try {
+            const jsonValue = JSON.stringify(userData);
+            AsyncStorage.setItem('userData', jsonValue);
+            AsyncStorage.setItem('userId', result.user.uid);
+            AsyncStorage.setItem('userPic', userData.pic);
+            console.log('usar Data', jsonValue);
+          } catch (e) {
+            console.log(e);
+          }
+        });
       navigation.navigate('Dashboard');
     } else {
       console.log('error');
     }
-    
-      return () => referance()
+
+    return () => referance();
   };
-  
+
   // const dispatch = useDispatch();
   // const userDetails = useSelector(state => state.user.userData);
   // const personalDetails = useSelector(state => state.user.personalData);
@@ -109,7 +109,7 @@ const LoginScreen = () => {
       </Appbar.Header>
       <Text style={styles.fontStyle}>Enter your phone number</Text>
       <Text style={styles.textStyle}>Carrier chares may apply</Text>
-      <Image source={{uri:WhatsappLogoo}} style={styles.imgStyle}/>
+      <Image source={{uri: WhatsappLogoo}} style={styles.imgStyle} />
       <View style={styles.inputTextStyle}>
         <TextInput
           label={'Email'}

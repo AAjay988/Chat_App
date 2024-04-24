@@ -7,7 +7,6 @@ import TextInput from '../components/TextInput';
 import {WhatsappLogo} from '../components/ImageLinks';
 
 const FirstScreen = () => {
-  const [phonenumber, setPhoneNumber] = useState('');
   const navigation = useNavigation();
   const handlebutton = () => {
     navigation.navigate('Login');

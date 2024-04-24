@@ -33,7 +33,7 @@ const SignupScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedImage, setSelectedImage] = useState('');
+  const [selectedImage, setSelectedImage] = useState(WhatsappLogoo);
   const [downloadURL, setDownloadURL] = useState('');
 
   const userSignup = async () => {

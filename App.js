@@ -41,7 +41,6 @@ const App = () => {
       .ref('/users/Aj123')
       .on('value', snapshot => {
        // console.log('User data: ', snapshot.val());
-        // Do something with the user data if needed
       });
   }, []);
   //console.log(userDetails);
